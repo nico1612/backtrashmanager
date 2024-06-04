@@ -1,8 +1,9 @@
 import {Router} from 'express'
 import {check} from 'express-validator'
 
-import { login, updatePassword, usuariosPost } from '../controller/auth.js'
+import { login, newUpdatePassword, updatePassword, usuariosPost } from '../controller/auth.js'
 import { validarCampos } from '../middleware/validar-campos.js'
+import { passwordValidityMiddleware } from '../middleware/UpdatePasword.js'
 
 export const routerAuth = Router()
 
@@ -20,7 +21,10 @@ routerAuth.post('/',[
 ], usuariosPost )
 
 routerAuth.post('/updatePassword',[
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
-    validarCampos
+
 ],updatePassword)
+
+routerAuth.post('/updateLostPassword',[
+    passwordValidityMiddleware,
+    validarCampos
+],newUpdatePassword)
