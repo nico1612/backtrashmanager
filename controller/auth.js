@@ -3,7 +3,6 @@ import { transporter } from '../config/nodemailer.js';
 import { Usuario } from '../models/usuarios.js';
 
 const errorMessage = 'Invalid credentials. Please check your email and password and try again, or use the password recovery option if you have forgotten your password.';
-
 export const login = async (req, res) => {
     const { correo, password } = req.body;
 
@@ -13,6 +12,13 @@ export const login = async (req, res) => {
         if (!usuario || usuario.password !== password) {
             return res.status(404).json({ msg: errorMessage });
         }
+
+        if (usuario.sesionIniciada) {
+            return res.status(400).json({ msg: "La sesión está iniciada en otro dispositivo" });
+        }
+
+        usuario.sesionIniciada = true;
+        await usuario.save();
 
         res.status(200).json({
             usuario,
@@ -102,4 +108,32 @@ Trash Project`
             console.error('Error al enviar el correo: ', error);
         }
     });
+};
+
+export const logout = async (req, res) => {
+    const { correo } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ correo });
+
+        if (!usuario) {
+            return res.status(404).json({ msg: "Usuario no encontrado" });
+        }
+
+        if (!usuario.sesionIniciada) {
+            return res.status(400).json({ msg: "La sesión ya está cerrada" });
+        }
+
+        usuario.sesionIniciada = false;
+        await usuario.save();
+
+        res.status(200).json({
+            usuario,
+            ok: true,
+            msg: "Sesión cerrada correctamente"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Hable con el administrador' });
+    }
 };

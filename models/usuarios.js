@@ -15,6 +15,10 @@ const UsuarioSchema = Schema({
         type: String,
         required: [true, 'La contraseña es obligatoria'],
     },
+    sesionIniciada: {
+        type: Boolean,
+        default: false
+    },
     passwordUpdatedAt: { type: Date, default: Date.now }
 })
 
