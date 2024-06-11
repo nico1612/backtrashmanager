@@ -12,9 +12,8 @@ export const login = async (req, res) => {
         if (!usuario || usuario.password !== password) {
             return res.status(404).json({ msg: errorMessage });
         }
-
-        if (usuario.sesionIniciada) {
-            return res.status(400).json({ msg: "La sesión está iniciada en otro dispositivo" });
+        if (usuario.sesionIniciada !== false) {
+            return res.status(400).json({ msg: "The session is already started on another device" });
         }
 
         usuario.sesionIniciada = true;
@@ -23,11 +22,11 @@ export const login = async (req, res) => {
         res.status(200).json({
             usuario,
             ok: true,
-            msg: "El usuario se encontró correctamente"
+            msg: "User found successfully"
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: 'Hable con el administrador' });
+        res.status(500).json({ msg: 'Speak with the administrator' });
     }
 };
 
@@ -37,7 +36,7 @@ export const usuariosPost = async (req, res) => {
         const existingUser = await Usuario.findOne({ correo });
 
         if (existingUser) {
-            return res.status(400).json({ msg: 'El usuario ya existe' });
+            return res.status(400).json({ msg: 'The user already exists' });
         }
 
         const usuario = new Usuario({ nombre, correo, password });
@@ -46,7 +45,7 @@ export const usuariosPost = async (req, res) => {
         res.json({ usuario });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: 'Ha ocurrido un error en el servidor.' });
+        res.status(500).json({ msg: 'A server error has occurred.' });
     }
 };
 
@@ -57,7 +56,7 @@ export const updatePassword = async (req, res) => {
         let usuario = await Usuario.findOne({ correo });
 
         if (!usuario) {
-            return res.status(404).json({ msg: 'Usuario no encontrado' });
+            return res.status(404).json({ msg: 'User not found' });
         }
 
         usuario.password = newPassword;
@@ -69,7 +68,7 @@ export const updatePassword = async (req, res) => {
         res.status(200).json({ msg: 'Your password has been successfully reset!' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: 'Error al actualizar la contraseña, hable con el administrador' });
+        res.status(500).json({ msg: 'Error updating the password, speak with the administrator' });
     }
 };
 
@@ -80,10 +79,10 @@ export const newUpdatePassword = async (req, res) => {
         let usuario = await Usuario.findOne({ correo });
         usuario.password = newPassword;
         await usuario.save();
-        res.status(200).json({ msg: 'Contraseña actualizada exitosamente' });
+        res.status(200).json({ msg: 'Password updated successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: 'Error al actualizar la contraseña, hable con el administrador' });
+        res.status(500).json({ msg: 'Error updating the password, speak with the administrator' });
     }
 };
 
@@ -105,7 +104,7 @@ Trash Project`
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.error('Error al enviar el correo: ', error);
+            console.error('Error sending the email: ', error);
         }
     });
 };
@@ -117,11 +116,11 @@ export const logout = async (req, res) => {
         const usuario = await Usuario.findOne({ correo });
 
         if (!usuario) {
-            return res.status(404).json({ msg: "Usuario no encontrado" });
+            return res.status(404).json({ msg: "User not found" });
         }
 
         if (!usuario.sesionIniciada) {
-            return res.status(400).json({ msg: "La sesión ya está cerrada" });
+            return res.status(400).json({ msg: "The session is already closed" });
         }
 
         usuario.sesionIniciada = false;
@@ -130,10 +129,10 @@ export const logout = async (req, res) => {
         res.status(200).json({
             usuario,
             ok: true,
-            msg: "Sesión cerrada correctamente"
+            msg: "Session closed successfully"
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: 'Hable con el administrador' });
+        res.status(500).json({ msg: 'Speak with the administrator' });
     }
 };
