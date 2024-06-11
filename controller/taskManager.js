@@ -1,14 +1,13 @@
 import Task from "../models/task.model.js"
 
-
 export const createTask = async (req, res) => {
     try {
-        const { assigned, completed, created, description, status } = req.body
+        const { id, assigned, endDate, created, description, status, dueDate } = req.body;
 
-        const newTask = new Task({ assigned, completed, created, description, status })
-        await newTask.save()
+        const newTask = new Task({ id, assigned, endDate, created, description, status, dueDate });
+        await newTask.save();
 
-        res.status(201).json({ task: newTask })
+        res.status(201).json({ task: newTask });
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: 'An error occurred while creating the task.' })
@@ -44,5 +43,22 @@ export const updateTask = async (req, res) => {
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: 'An error occurred while updating the task.' })
+    }
+}
+
+export const deleteTask = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const task = await Task.findOneAndDelete({ id })
+
+        if (!task) {
+            return res.status(404).json({ msg: 'Task not found' })
+        }
+
+        res.status(200).json({ msg: 'Task deleted successfully' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'An error occurred while deleting the task.' })
     }
 }

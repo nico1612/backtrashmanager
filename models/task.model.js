@@ -10,8 +10,11 @@ const taskSchema = new Schema({
         type: String,
         required: [true, 'El nombre es obligatorio']
     },
-    completed: {
+    dueDate: {
         type: Date,
+    },
+    endDate:{
+        type: Date, 
     },
     created: {
         type: Date,

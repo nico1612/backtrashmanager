@@ -9,20 +9,21 @@ export const login = async (req, res) => {
 
         if (!usuario) {
             return res.status(404).json({
-                msg: 'Usuario / Password no son correctos'
+                msg: 'Invalid credentials. Please check your email and password and try again, or use the password recovery option if you have forgotten your password.'
             });
         }
 
         const validPassword = password === usuario.password;
         if (!validPassword) {
             return res.status(404).json({
-                msg: 'Usuario / Password no son correctos'
+                msg: 'Invalid credentials. Please check your email and password and try again, or use the password recovery option if you have forgotten your password.'
             });
         }
 
         res.status(200).json({
             usuario,
-            ok: true
+            ok: true,
+            msg:"El usuario se encontró correctamente"
         });
     } catch (error) {
         console.error(error);
@@ -71,8 +72,18 @@ export const updatePassword = async (req, res) => {
         const mailOptions = {
             from: 'your-email@gmail.com',
             to: correo,
-            subject: 'Actualización de Contraseña',
-            text: `Tu nueva contraseña es: ${newPassword}. Recuerda que esta contraseña es válida solo por 5 minutos.`
+            subject: 'Your Trash Project Password Reset Code',
+            text: `Hi ${usuario.nombre},
+
+                To reset your password on Trash Project, please check your email. We have sent an alphanumeric code 
+                ${newPassword} 
+                with instructions to help you securely regain access to your account. Please note that this code will be valid for 30 days.
+
+                Thank you for trusting Trash Project!
+
+                Best regards,
+
+                Trash Project`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -83,7 +94,7 @@ export const updatePassword = async (req, res) => {
                 });
             }
             res.status(200).json({
-                msg: 'Contraseña actualizada exitosamente y correo enviado'
+                msg: 'Your password has been successfully reset!'
             });
         });
     
